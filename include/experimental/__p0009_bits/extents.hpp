@@ -137,7 +137,7 @@ template <size_t R, size_t... Values> struct index_sequence_scan_impl;
 
 template <size_t R, size_t FirstVal, size_t... Values>
 struct index_sequence_scan_impl<R, FirstVal, Values...> {
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static size_t get(size_t r) {
     if (r > R)
       return FirstVal + index_sequence_scan_impl<R + 1, Values...>::get(r);
