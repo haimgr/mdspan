@@ -152,17 +152,17 @@ struct index_sequence_scan_impl<R, FirstVal> {
     defined(_MDSPAN_COMPILER_INTEL)
   // NVCC warns about pointless comparison with 0 for R==0 and r being const
   // evaluatable and also 0.
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static size_t get(size_t r) {
     return static_cast<int64_t>(R) > static_cast<int64_t>(r) ? FirstVal : 0;
   }
 #else
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static size_t get(size_t r) { return R > r ? FirstVal : 0; }
 #endif
 };
 template <> struct index_sequence_scan_impl<0> {
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static size_t get(size_t) { return 0; }
 };
 
