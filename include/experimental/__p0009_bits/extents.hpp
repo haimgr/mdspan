@@ -75,14 +75,14 @@ template <size_t R, class T, T... Extents> struct static_array_impl;
 
 template <size_t R, class T, T FirstExt, T... Extents>
 struct static_array_impl<R, T, FirstExt, Extents...> {
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static T get(size_t r) {
     if (r == R)
       return FirstExt;
     else
       return static_array_impl<R + 1, T, Extents...>::get(r);
   }
-  template <size_t r> MDSPAN_INLINE_FUNCTION constexpr static T get() {
+  template <size_t r> MDSPAN_FORCE_INLINE_FUNCTION constexpr static T get() {
 #if MDSPAN_HAS_CXX_17
     if constexpr (r == R)
       return FirstExt;
@@ -97,18 +97,18 @@ struct static_array_impl<R, T, FirstExt, Extents...> {
 // End the recursion
 template <size_t R, class T, T FirstExt>
 struct static_array_impl<R, T, FirstExt> {
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static T get(size_t) { return FirstExt; }
-  template <size_t> MDSPAN_INLINE_FUNCTION constexpr static T get() {
+  template <size_t> MDSPAN_FORCE_INLINE_FUNCTION constexpr static T get() {
     return FirstExt;
   }
 };
 
 // Don't start recursion if size 0
 template <class T> struct static_array_impl<0, T> {
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static T get(size_t) { return T(); }
-  template <size_t> MDSPAN_INLINE_FUNCTION constexpr static T get() {
+  template <size_t> MDSPAN_FORCE_INLINE_FUNCTION constexpr static T get() {
     return T();
   }
 };
@@ -177,16 +177,16 @@ template <> struct index_sequence_scan_impl<0> {
 
 template <class T, size_t N> struct possibly_empty_array {
   T vals[N]{};
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr T &operator[](size_t r) { return vals[r]; }
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr const T &operator[](size_t r) const { return vals[r]; }
 };
 
 template <class T> struct possibly_empty_array<T, 0> {
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr T operator[](size_t) { return T(); }
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr const T operator[](size_t) const { return T(); }
 };
 
@@ -348,16 +348,16 @@ public:
 #endif
 
   // access functions
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static TStatic static_value(size_t r) { return static_vals_t::get(r); }
 
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr TDynamic value(size_t r) const {
     TStatic static_val = static_vals_t::get(r);
     return static_val == dyn_tag ? m_dyn_vals[dyn_map_t::get(r)]
                                         : static_cast<TDynamic>(static_val);
   }
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr TDynamic operator[](size_t r) const { return value(r); }
 
 
