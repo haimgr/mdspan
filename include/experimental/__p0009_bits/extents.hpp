@@ -407,9 +407,9 @@ public:
   MDSPAN_INLINE_FUNCTION
   constexpr static rank_type rank_dynamic() noexcept { return m_rank_dynamic; }
 
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr index_type extent(rank_type r) const noexcept { return m_vals.value(r); }
-  MDSPAN_INLINE_FUNCTION
+  MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static size_t static_extent(rank_type r) noexcept {
     return vals_t::static_value(r);
   }
