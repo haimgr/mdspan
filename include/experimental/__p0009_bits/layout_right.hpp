@@ -41,31 +41,23 @@ class layout_right::mapping {
     template <class>
     friend class mapping;
 
-    // i0+(i1 + E(1)*(i2 + E(2)*i3))
-    template <size_t r, size_t Rank>
-    struct __rank_count {};
-
-    template <size_t r, size_t Rank, class I, class... Indices>
     MDSPAN_FORCE_INLINE_FUNCTION
-    constexpr index_type __compute_offset(
-      index_type offset, __rank_count<r,Rank>, const I& i, Indices... idx) const {
-      return __compute_offset(offset * __extents.extent(r) + i,__rank_count<r+1,Rank>(),  idx...);
+    constexpr index_type __compute_offset2_recursive(index_type acc) const {
+      return acc;
     }
 
-    template<class I, class ... Indices>
+    template <class... Indices>
     MDSPAN_FORCE_INLINE_FUNCTION
-    constexpr index_type __compute_offset(
-      __rank_count<0,extents_type::rank()>, const I& i, Indices... idx) const {
-      return __compute_offset(i,__rank_count<1,extents_type::rank()>(),idx...);
+    constexpr index_type __compute_offset2_recursive(index_type acc, const index_type &index, const Indices& ...indices) const {
+      constexpr size_t r = Extents::rank() - 1 - sizeof...(Indices);
+      return __compute_offset2_recursive(acc * __extents.extent(r) + index, indices...);
     }
 
+    template <class... Indices>
     MDSPAN_FORCE_INLINE_FUNCTION
-    constexpr index_type __compute_offset(size_t offset, __rank_count<extents_type::rank(), extents_type::rank()>) const {
-      return static_cast<index_type>(offset);
+    constexpr index_type __compute_offset2(const Indices& ...indices) const {
+      return __compute_offset2_recursive(0, indices...);
     }
-
-    MDSPAN_FORCE_INLINE_FUNCTION
-    constexpr index_type __compute_offset(__rank_count<0,0>) const { return 0; }
 
   public:
 
@@ -195,7 +187,7 @@ class layout_right::mapping {
     )
     MDSPAN_FORCE_INLINE_FUNCTION
     constexpr index_type operator()(Indices... idxs) const noexcept {
-      return __compute_offset(__rank_count<0, extents_type::rank()>(), static_cast<index_type>(idxs)...);
+      return __compute_offset2(static_cast<index_type>(idxs)...);
     }
 
     MDSPAN_INLINE_FUNCTION static constexpr bool is_always_unique() noexcept { return true; }
