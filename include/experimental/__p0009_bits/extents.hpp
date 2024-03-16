@@ -215,7 +215,7 @@ private:
   _MDSPAN_NO_UNIQUE_ADDRESS possibly_empty_array<TDynamic, m_size_dynamic>
       m_dyn_vals;
 
-  // static mapping of indices to the position in the dynamic values array
+// static mapping of indices to the position in the dynamic values array
   using dyn_map_t = index_sequence_scan_impl<0, static_cast<size_t>(Values == dyn_tag)...>;
 public:
 
@@ -351,11 +351,30 @@ public:
   MDSPAN_FORCE_INLINE_FUNCTION
   constexpr static TStatic static_value(size_t r) { return static_vals_t::get(r); }
 
+
+  template<size_t r>
+  MDSPAN_FORCE_INLINE_FUNCTION
+  constexpr TDynamic value__() const {
+    constexpr TStatic static_val = static_vals_t::get(r);
+    constexpr size_t dyn_val_index = dyn_map_t::get(r);
+    constexpr bool is_dyn = (static_val == dyn_tag); 
+    return is_dyn ? m_dyn_vals[dyn_val_index] : static_cast<TDynamic>(static_val);
+  }
+  
+
+  template<size_t i = 0>
+  MDSPAN_FORCE_INLINE_FUNCTION
+  constexpr TDynamic value__(size_t r) const {
+    if constexpr(size_dynamic() == size()) return m_dyn_vals[r];
+    if constexpr(i == size()) __builtin_trap(); else { if (r == i) return value__<i>(); else return value__<i + 1>(r); }
+  }
+  
   MDSPAN_FORCE_INLINE_FUNCTION
   constexpr TDynamic value(size_t r) const {
-    TStatic static_val = static_vals_t::get(r);
-    return static_val == dyn_tag ? m_dyn_vals[dyn_map_t::get(r)]
-                                        : static_cast<TDynamic>(static_val);
+    return value__(r);
+    // TStatic static_val = static_vals_t::get(r);
+    // return static_val == dyn_tag ? m_dyn_vals[dyn_map_t::get(r)]
+    //                                     : static_cast<TDynamic>(static_val);
   }
   MDSPAN_FORCE_INLINE_FUNCTION
   constexpr TDynamic operator[](size_t r) const { return value(r); }
