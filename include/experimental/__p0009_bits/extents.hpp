@@ -364,9 +364,9 @@ public:
 
   template<size_t i = 0>
   MDSPAN_FORCE_INLINE_FUNCTION
-  constexpr TDynamic value__(size_t r) const {
+  constexpr TDynamic value__(const size_t &r) const {
     if constexpr(size_dynamic() == size()) return m_dyn_vals[r];
-    if constexpr(i == size()) __builtin_trap(); else { if (r == i) return value__<i>(); else return value__<i + 1>(r); }
+    if constexpr(i == size()) TDynamic(); else { if (r == i) return value__<i>(); else return value__<i + 1>(r); }
   }
   
   MDSPAN_FORCE_INLINE_FUNCTION
